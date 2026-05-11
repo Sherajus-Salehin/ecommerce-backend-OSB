@@ -6,7 +6,7 @@ spring:
     active: dev
 
   mvc:
-    problemdetails:
+    problem-details:
       enabled: true
 
 payment:
