@@ -17,4 +17,5 @@ public record CartItemResponse(
         Double unitPrice,
         Double lineTotal
 ) {
+
 }

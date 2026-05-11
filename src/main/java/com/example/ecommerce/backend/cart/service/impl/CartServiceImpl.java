@@ -1,6 +1,7 @@
 package com.example.ecommerce.backend.cart.service.impl;
 
 import com.example.ecommerce.backend.cart.dto.request.CartItemAddRequest;
+import com.example.ecommerce.backend.cart.dto.response.CartItemResponse;
 import com.example.ecommerce.backend.cart.dto.response.CartResponse;
 import com.example.ecommerce.backend.cart.entity.Cart;
 import com.example.ecommerce.backend.cart.entity.CartItem;
@@ -10,6 +11,7 @@ import com.example.ecommerce.backend.cart.service.CartService;
 import com.example.ecommerce.backend.common.exception.ResourceConflictException;
 import com.example.ecommerce.backend.inventory.entity.Inventory;
 import com.example.ecommerce.backend.inventory.repository.InventoryRepository;
+import com.example.ecommerce.backend.product.dto.response.ProductSuggestionResponse;
 import com.example.ecommerce.backend.product.entity.Product;
 import com.example.ecommerce.backend.product.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -97,6 +101,22 @@ public class CartServiceImpl implements CartService {
         cartRepository.saveAndFlush(cart);
     }
 
+    @Override
+    public List<ProductSuggestionResponse> getSuggestion(Long currentUserId) {
+        List<Long> pids = getCart(currentUserId).items().stream().map(CartItemResponse::id).toList();
+        if (pids.isEmpty()) {
+            return Collections.emptyList();
+        }else {
+            for(Long pid : pids) {
+                //find category first
+                //get price difference range by subtracting 100 and adding 100
+                //handle Levenshtein by postgre or here
+                //The whole thing can be a query
+            }
+        }
+        return Collections.emptyList();
+    }
+
     private Cart createCart(Long userId) {
         return Cart.builder()
                 .userId(userId)
@@ -119,4 +139,5 @@ public class CartServiceImpl implements CartService {
                                                 + inventory.getProduct().getId());
         }
     }
+
 }

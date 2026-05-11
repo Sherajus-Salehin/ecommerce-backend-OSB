@@ -2,6 +2,9 @@ package com.example.ecommerce.backend.cart.service;
 
 import com.example.ecommerce.backend.cart.dto.request.CartItemAddRequest;
 import com.example.ecommerce.backend.cart.dto.response.CartResponse;
+import com.example.ecommerce.backend.product.dto.response.ProductSuggestionResponse;
+
+import java.util.List;
 
 /**
  * Service interface for shopping cart operations.
@@ -40,4 +43,6 @@ public interface CartService {
      * @throws com.example.ecommerce.backend.common.exception.ResourceConflictException when cart belongs to another user
      */
     void clearCart(Long userId, Long cartId);
+
+    List<ProductSuggestionResponse> getSuggestion(Long currentUserId);
 }

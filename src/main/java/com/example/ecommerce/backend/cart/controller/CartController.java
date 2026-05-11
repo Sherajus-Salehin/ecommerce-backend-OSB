@@ -1,10 +1,12 @@
 package com.example.ecommerce.backend.cart.controller;
 
 import com.example.ecommerce.backend.cart.dto.request.CartItemAddRequest;
+import com.example.ecommerce.backend.cart.dto.response.CartItemResponse;
 import com.example.ecommerce.backend.cart.dto.response.CartResponse;
 import com.example.ecommerce.backend.cart.service.CartService;
 import com.example.ecommerce.backend.common.constants.ApiEndpoints;
 import com.example.ecommerce.backend.common.dto.response.ApiResponse;
+import com.example.ecommerce.backend.product.dto.response.ProductSuggestionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * REST controller for managing the current user's shopping cart.
@@ -126,5 +130,11 @@ public class CartController {
     @GetMapping
     public ResponseEntity<ApiResponse<CartResponse>> getCart() {
         return ResponseEntity.ok(ApiResponse.success(cartService.getCart(CURRENT_USER_ID)));
+    }
+    @GetMapping("/suggestions")
+    public ResponseEntity<ApiResponse<List<ProductSuggestionResponse>>> getSuggestions() {
+        //ProductSuggestionResponse [] suggestions=new ProductSuggestionResponse[3];
+
+        return ResponseEntity.ok(ApiResponse.success(cartService.getSuggestion(CURRENT_USER_ID)));
     }
 }
