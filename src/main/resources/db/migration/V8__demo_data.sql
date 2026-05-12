@@ -36,7 +36,7 @@ VALUES
 INSERT INTO orders (id, order_number, user_id, status, total_amount, cancelled_at, created_at, modified_at, created_by, modified_by)
 VALUES
 (1, '3fa85f64-5717-4562-b3fc-2c963f66afa6', 3, 'PAID', 259.97, NULL, now(), now(), 3, 3),
-(2, 'c56a4180-65aa-42ec-a945-5fd21dec0538', 4, 'CREATED', 229.98, NULL, now(), now(), 4, 4);
+(2, '4fa85f64-5717-4562-b3fc-2c963f66afa6', 4, 'CREATED', 229.98, NULL, now(), now(), 4, 4);
 
 INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity, total_price)
 VALUES
