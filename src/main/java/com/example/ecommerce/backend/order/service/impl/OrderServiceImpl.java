@@ -10,22 +10,27 @@ import com.example.ecommerce.backend.inventory.repository.InventoryRepository;
 import com.example.ecommerce.backend.order.dto.request.CreateOrderRequest;
 import com.example.ecommerce.backend.order.dto.response.OrderCheckoutResponse;
 import com.example.ecommerce.backend.order.dto.response.OrderResponse;
+import com.example.ecommerce.backend.order.entity.Coupon;
 import com.example.ecommerce.backend.order.entity.Order;
 import com.example.ecommerce.backend.order.entity.OrderItem;
 import com.example.ecommerce.backend.order.entity.OrderStatus;
 import com.example.ecommerce.backend.order.mapper.OrderMapper;
+import com.example.ecommerce.backend.order.repository.CouponRepository;
 import com.example.ecommerce.backend.order.repository.OrderRepository;
 import com.example.ecommerce.backend.order.service.OrderCancellationService;
 import com.example.ecommerce.backend.order.service.OrderService;
 import com.example.ecommerce.backend.payment.dto.response.PaymentResponse;
 import com.example.ecommerce.backend.payment.service.PaymentService;
 import com.example.ecommerce.backend.product.entity.Product;
+import com.stripe.service.CouponService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -49,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final PaymentService paymentService;
     private final OrderCancellationService orderCancellationService;
+    private final CouponRepository couponRepository;
 
     @Override
     @Transactional
@@ -77,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
             order.getItems().add(toOrderItem(order, cartItem));
         });
 
-        order.setTotalAmount(calculateTotalAmount(order));
+        order.setTotalAmount(calculateTotalAmount(order,request.couponCode()));
         Order savedOrder = orderRepository.saveAndFlush(order);
         cartService.clearCart(userId, cart.getId());
         PaymentResponse paymentResponse = paymentService.initiatePayment(savedOrder.getId());
@@ -171,10 +177,16 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    private Double calculateTotalAmount(Order order) {
-        return order.getItems()
+    private Double calculateTotalAmount(Order order, String s) {
+        Double discountAmount=0.0;
+        Double total= order.getItems()
                 .stream()
                 .mapToDouble(OrderItem::getTotalPrice)
                 .sum();
+        if(s!=null) {
+            Coupon c=couponRepository.findByCode(s).orElseThrow(() -> new EntityNotFoundException("Coupon not found: " + s));
+            discountAmount=Math.min(c.getCap(),(total*c.getDiscount())/100.00);
+        }
+        return Math.max(0.0,total-discountAmount);
     }
 }

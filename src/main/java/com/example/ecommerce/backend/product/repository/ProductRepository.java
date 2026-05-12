@@ -28,7 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
             WHERE p.category=:category AND
             p.price BETWEEN :tkl AND :tkh
-            AND p.isActive=true AND p.productId != :productId
+            AND p.isActive=true AND p.id != :productId
             """)
     List<Product> findByCategoryAndPrice(@Param("category") Category category,
                                          @Param("tkl") Double tkl,

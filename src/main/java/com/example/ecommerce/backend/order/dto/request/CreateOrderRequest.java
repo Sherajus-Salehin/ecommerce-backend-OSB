@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
  */
 public record CreateOrderRequest(
         @NotNull(message = "Cart ID is required")
-        Long cartId
+        Long cartId,
+        String couponCode
 ) {
 }
