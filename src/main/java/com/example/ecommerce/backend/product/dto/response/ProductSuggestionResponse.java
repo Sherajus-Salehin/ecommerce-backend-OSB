@@ -6,12 +6,7 @@ public record ProductSuggestionResponse(
         String name,
         String description,
         Double price,
-        Long categoryId,
-        String imageUrl,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt,
-        Long createdBy,
-        Long modifiedBy
+        String imageUrl
 ) {
 
 }

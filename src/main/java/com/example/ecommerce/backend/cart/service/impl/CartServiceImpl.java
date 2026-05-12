@@ -12,16 +12,16 @@ import com.example.ecommerce.backend.common.exception.ResourceConflictException;
 import com.example.ecommerce.backend.inventory.entity.Inventory;
 import com.example.ecommerce.backend.inventory.repository.InventoryRepository;
 import com.example.ecommerce.backend.product.dto.response.ProductSuggestionResponse;
+import com.example.ecommerce.backend.product.entity.Category;
 import com.example.ecommerce.backend.product.entity.Product;
 import com.example.ecommerce.backend.product.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Implementation of {@link CartService} for managing user shopping carts.
@@ -103,18 +103,38 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<ProductSuggestionResponse> getSuggestion(Long currentUserId) {
-        List<Long> pids = getCart(currentUserId).items().stream().map(CartItemResponse::id).toList();
+        List<ProductSuggestionResponse> suggestions = new ArrayList<>();
+        List<Long> pids = getCart(currentUserId).items().stream().map(CartItemResponse::productId).toList();
         if (pids.isEmpty()) {
             return Collections.emptyList();
         }else {
+            int suggestionCount = 0;
+            LevenshteinDistance ld = new LevenshteinDistance();
+            Set<String> checked=new HashSet<>();
             for(Long pid : pids) {
-                //find category first
-                //get price difference range by subtracting 100 and adding 100
-                //handle Levenshtein by postgre or here
-                //The whole thing can be a query
+                Product p= productRepository.findById(pid).orElseThrow(() -> new EntityNotFoundException("Product not found: " + pid));
+                Category c=p.getCategory();
+                if(!checked.contains(c.getName()) && suggestionCount<3) {
+                    checked.add(c.getName());
+                    suggestionCount++;
+                    Double tkl=Math.max(0,p.getPrice()-100);
+                    Double tkh=p.getPrice()+100;
+                    List<Product> narrowedDown=productRepository.findByCategoryAndPrice(c,tkl,tkh,pid);
+                    String target=p.getName();
+                    Product bestMatch = null;
+                    int bestScore=Integer.MAX_VALUE;
+                    for(Product test: narrowedDown) {
+                        int match=ld.apply(target,test.getName());
+                        if(match<bestScore) {
+                            bestScore=match;
+                            bestMatch=test;
+                        }
+                    }
+                    if(bestMatch!=null) suggestions.add(cartMapper.toProductSuggestionResponse(bestMatch));
+                }
             }
+        return  suggestions;
         }
-        return Collections.emptyList();
     }
 
     private Cart createCart(Long userId) {

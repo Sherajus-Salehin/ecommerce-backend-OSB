@@ -4,6 +4,8 @@ import com.example.ecommerce.backend.cart.dto.response.CartItemResponse;
 import com.example.ecommerce.backend.cart.dto.response.CartResponse;
 import com.example.ecommerce.backend.cart.entity.Cart;
 import com.example.ecommerce.backend.cart.entity.CartItem;
+import com.example.ecommerce.backend.product.dto.response.ProductSuggestionResponse;
+import com.example.ecommerce.backend.product.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -75,5 +77,13 @@ public interface CartMapper {
                 .stream()
                 .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
                 .sum();
+    }
+
+    default ProductSuggestionResponse toProductSuggestionResponse(Product product) {
+        return new ProductSuggestionResponse(
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getImageUrl());
     }
 }

@@ -58,6 +58,8 @@ dependencies {
 
     // Runtime launcher used by Gradle to execute JUnit Platform tests.
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //for text similarity score library
+    implementation 'org.apache.commons:commons-text:1.11.0'
 }
 
 tasks.named('test') {
