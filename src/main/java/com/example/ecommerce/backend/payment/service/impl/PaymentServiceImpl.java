@@ -3,6 +3,7 @@ package com.example.ecommerce.backend.payment.service.impl;
 import com.example.ecommerce.backend.common.exception.ResourceConflictException;
 import com.example.ecommerce.backend.inventory.entity.Inventory;
 import com.example.ecommerce.backend.inventory.repository.InventoryRepository;
+import com.example.ecommerce.backend.mail.service.impl.PaymentConfirmationMail;
 import com.example.ecommerce.backend.order.entity.Order;
 import com.example.ecommerce.backend.order.entity.OrderItem;
 import com.example.ecommerce.backend.order.entity.OrderStatus;
@@ -48,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final StripeConfig stripeConfig;
     private final PaymentExpirationProperties paymentExpirationProperties;
-
+    private final PaymentConfirmationMail paymentConfirmation;
     /**
      * Creates a Stripe Checkout Session for a confirmed order and stores the
      * initiated payment attempt.
@@ -110,6 +111,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         orderRepository.save(order);
         paymentHistoryRepository.save(paymentHistory);
+
+        //email caller
+        paymentConfirmation.sendPaymentConfirmation(order,paymentHistory);
+
+
         log.info("Successful payment handled for sessionId={}, orderId={}", sessionId, order.getId());
     }
 

@@ -33,3 +33,14 @@ logging:
     com:
       example:
         ecommerce_service: INFO
+  config:
+    import: optional:file:./config/secrets.yaml
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
